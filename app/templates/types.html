@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}配置类型 - 配置中心{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">配置类型</h1>
+            <!-- 添加新增按钮 -->
+            <button class="btn btn-primary" onclick="showAddTypeModal()">添加类型</button>
+        </div>
+        <div class="card-body">
+            <div class="search-container">
+                <form class="search-box" action="/page/types" method="get">
+                    <input type="text" name="search" class="form-control search-input" placeholder="搜索类型名称或描述..." value="{{ request.query_params.get('search', '') }}">
+                    <button type="submit" class="btn btn-primary">搜索</button>
+                    {% if request.query_params.get('search') %}
+                    <a href="/page/types" class="btn btn-secondary">清除</a>
+                    {% endif %}
+                </form>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类型名称</th>
+                            <th>描述</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for type in types %}
+                        <tr>
+                            <td>
+                                <!-- 添加链接，点击类型名称跳转到对应的配置项列表 -->
+                                <a href="/page/configs?type_name={{ type.type_name }}">{{ type.type_name }}</a>
+                            </td>
+                            <td>{{ type.description }}</td>
+                            <td>
+                                <!-- 添加编辑和删除按钮 -->
+                                <button class="btn btn-sm btn-secondary" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteType('{{ type.type_name }}')">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加类型模态框 -->
+<div id="addTypeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>添加配置类型</h2>
+            <span class="close" onclick="closeAddTypeModal()">&times;</span>
+        </div>
+        <form id="addTypeForm">
+            <div class="form-group">
+                <label for="typeName" class="form-label">类型名称</label>
+                <input type="text" id="typeName" name="type_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="typeDescription" class="form-label">描述</label>
+                <textarea id="typeDescription" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div>
+
+<!-- 编辑类型模态框 -->
+<div id="editTypeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>编辑配置类型</h2>
+            <span class="close" onclick="closeEditTypeModal()">&times;</span>
+        </div>
+        <form id="editTypeForm">
+            <input type="hidden" id="editTypeName" name="type_name">
+            <div class="form-group">
+                <label for="editTypeDescription" class="form-label">描述</label>
+                <textarea id="editTypeDescription" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 添加类型模态框
+    function showAddTypeModal() {
+        document.getElementById('addTypeModal').style.display = 'block';
+    }
+    
+    function closeAddTypeModal() {
+        document.getElementById('addTypeModal').style.display = 'none';
+    }
+    
+    // 编辑类型模态框
+    function showEditTypeModal(typeName, description) {
+        document.getElementById('editTypeName').value = typeName;
+        document.getElementById('editTypeDescription').value = description;
+        document.getElementById('editTypeModal').style.display = 'block';
+    }
+    
+    function closeEditTypeModal() {
+        document.getElementById('editTypeModal').style.display = 'none';
+    }
+    
+    // 确认删除类型
+    function confirmDeleteType(typeName) {
+        if (confirm(`确定要删除类型 "${typeName}" 吗？`)) {
+            deleteType(typeName);
+        }
+    }
+    
+    // 添加类型表单提交
+    document.getElementById('addTypeForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const typeName = document.getElementById('typeName').value;
+        const description = document.getElementById('typeDescription').value;
+        
+        try {
+            const response = await fetch('/api/types/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({
+                    type_name: typeName,
+                    description: description
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '添加类型失败');
+            }
+            
+            // 关闭模态框并刷新页面
+            closeAddTypeModal();
+            showMessage('添加类型成功', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showMessage(error.message, 'danger');
+        }
+    });
+    
+    // 编辑类型表单提交
+    document.getElementById('editTypeForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const typeName = document.getElementById('editTypeName').value;
+        const description = document.getElementById('editTypeDescription').value;
+        
+        try {
+            const response = await fetch(`/api/types/${typeName}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({
+                    description: description
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '更新类型失败');
+            }
+            
+            // 关闭模态框并刷新页面
+            closeEditTypeModal();
+            showMessage('更新类型成功', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showMessage(error.message, 'danger');
+        }
+    });
+    
+    // 删除类型
+    async function deleteType(typeName) {
+        try {
+            console.log(`正在删除类型: ${typeName}`); // 添加调试日志
+            
+            const response = await fetch(`/api/types/${encodeURIComponent(typeName)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '删除类型失败');
+            }
+            
+            showMessage('删除类型成功', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            console.error('删除类型出错:', error); // 添加错误日志
+            showMessage(error.message, 'danger');
+        }
+    }
+</script>
+{% endblock %}

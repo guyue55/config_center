@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - 配置中心{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto; margin-top: 50px;">
+    <div class="card-header">
+        <h1 class="card-title">用户登录</h1>
+    </div>
+    <div class="card-body">
+        <div id="login-error" class="alert alert-danger" style="display: none;"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">登录</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // 直接从表单元素获取值
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        
+        if (!usernameInput || !passwordInput) {
+            console.error('找不到用户名或密码输入框');
+            showMessage('登录表单错误', 'danger');
+            return;
+        }
+        
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        
+        // 检查用户名和密码是否为空
+        if (!username || !password) {
+            const errorElement = document.getElementById('login-error');
+            errorElement.textContent = '用户名和密码不能为空';
+            errorElement.style.display = 'block';
+            return;
+        }
+        
+        console.log('提交登录，用户名:', username); // 调试输出
+        
+        try {
+            // 使用URLSearchParams直接构建表单数据
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+            
+            const response = await fetch('/api/auth/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString(),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '登录失败');
+            }
+            
+            const data = await response.json();
+            
+            // 保存令牌到本地存储
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('role', data.role);
+            
+            // 显示成功消息
+            showMessage('登录成功，正在跳转...', 'success');
+            
+            // 重定向到首页
+            setTimeout(() => {
+                window.location.href = '/page';
+            }, 1000);
+        } catch (error) {
+            const errorElement = document.getElementById('login-error');
+            errorElement.textContent = error.message;
+            errorElement.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 配置中心{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">欢迎使用配置中心</h1>
+    </div>
+    <div class="card-body">
+        <p>配置中心是一个统一管理各类配置的平台，提供便捷的配置创建、修改、删除和查询功能。</p>
+        
+        <div style="margin-top: 2rem; display: flex; gap: 2rem;">
+            <div class="card" style="flex: 1;">
+                <h3>配置类型</h3>
+                <p style="font-size: 2rem; margin: 1rem 0; color: var(--primary-color);">
+                    {{ types_count|default(0) }}
+                </p>
+                <a href="/api/types" class="btn btn-primary">查看类型</a>
+            </div>
+            
+            <div class="card" style="flex: 1;">
+                <h3>配置项</h3>
+                <p style="font-size: 2rem; margin: 1rem 0; color: var(--primary-color);">
+                    {{ configs_count|default(0) }}
+                </p>
+                <a href="/api/configs" class="btn btn-primary">查看配置</a>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <h2>快速入门</h2>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>在<a href="/api/types">类型管理</a>中创建新的配置类型</li>
+                <li>在<a href="/api/configs">配置管理</a>中添加配置项</li>
+                <li>使用搜索功能快速查找配置</li>
+                {% if current_user and current_user.role == 'admin' %}
+                <li>在<a href="/api/users">用户管理</a>中管理用户权限</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
