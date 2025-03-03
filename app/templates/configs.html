@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}配置项 - 配置中心{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">配置项</h1>
+            <!-- 添加新增按钮 -->
+            <button class="btn btn-primary" onclick="showAddConfigModal()">添加配置</button>
+        </div>
+        <div class="card-body">
+            <div class="search-container">
+                <form class="search-box" action="/page/configs" method="get">
+                    <select name="type_name" class="form-control" onchange="this.form.submit()">
+                        <option value="">所有类型</option>
+                        {% for type in types %}
+                        <option value="{{ type.type_name }}" {% if current_type == type.type_name %}selected{% endif %}>{{ type.type_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="search" class="form-control search-input" placeholder="搜索键名或值..." value="{{ request.query_params.get('search', '') }}">
+                    <button type="submit" class="btn btn-primary">搜索</button>
+                    {% if request.query_params.get('search') or request.query_params.get('type_name') %}
+                    <a href="/page/configs" class="btn btn-secondary">清除</a>
+                    {% endif %}
+                </form>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>键名</th>
+                            <th>值</th>
+                            <th>描述</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for config in configs %}
+                        <tr>
+                            <td>{{ config.type.type_name }}</td>
+                            <td>{{ config.key }}</td>
+                            <td>{{ config.value }}</td>
+                            <td>{{ config.key_description }}</td>
+                            <td>
+                                <!-- 添加编辑和删除按钮 -->
+                                <button class="btn btn-sm btn-secondary" onclick="showEditConfigModal('{{ config.type.type_name }}', '{{ config.key }}', '{{ config.value }}', '{{ config.key_description }}')">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteConfig('{{ config.type.type_name }}', '{{ config.key }}')">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加配置模态框 -->
+<div id="addConfigModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>添加配置项</h2>
+            <span class="close" onclick="closeAddConfigModal()">&times;</span>
+        </div>
+        <form id="addConfigForm">
+            <div class="form-group">
+                <label for="configType" class="form-label">类型</label>
+                <select id="configType" name="type_name" class="form-control" required>
+                    {% for type in types %}
+                    <option value="{{ type.type_name }}">{{ type.type_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="configKey" class="form-label">键名</label>
+                <input type="text" id="configKey" name="key" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="configValue" class="form-label">值</label>
+                <input type="text" id="configValue" name="value" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="configDescription" class="form-label">描述</label>
+                <textarea id="configDescription" name="key_description" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div>
+
+<!-- 编辑配置模态框 -->
+<div id="editConfigModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>编辑配置项</h2>
+            <span class="close" onclick="closeEditConfigModal()">&times;</span>
+        </div>
+        <form id="editConfigForm">
+            <input type="hidden" id="editConfigType" name="type_name">
+            <input type="hidden" id="editConfigKey" name="key">
+            <div class="form-group">
+                <label for="editConfigValue" class="form-label">值</label>
+                <input type="text" id="editConfigValue" name="value" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="editConfigDescription" class="form-label">描述</label>
+                <textarea id="editConfigDescription" name="key_description" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 添加配置模态框
+    function showAddConfigModal() {
+        document.getElementById('addConfigModal').style.display = 'block';
+    }
+    
+    function closeAddConfigModal() {
+        document.getElementById('addConfigModal').style.display = 'none';
+    }
+    
+    // 编辑配置模态框
+    function showEditConfigModal(typeName, key, value, description) {
+        document.getElementById('editConfigType').value = typeName;
+        document.getElementById('editConfigKey').value = key;
+        document.getElementById('editConfigValue').value = value;
+        document.getElementById('editConfigDescription').value = description;
+        document.getElementById('editConfigModal').style.display = 'block';
+    }
+    
+    function closeEditConfigModal() {
+        document.getElementById('editConfigModal').style.display = 'none';
+    }
+    
+    // 确认删除配置
+    function confirmDeleteConfig(typeName, key) {
+        if (confirm(`确定要删除配置 "${typeName}.${key}" 吗？`)) {
+            deleteConfig(typeName, key);
+        }
+    }
+    
+    // 添加配置表单提交
+    document.getElementById('addConfigForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const typeName = document.getElementById('configType').value;
+        const key = document.getElementById('configKey').value;
+        const value = document.getElementById('configValue').value;
+        const description = document.getElementById('configDescription').value;
+        
+        try {
+            const response = await fetch('/api/configs/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({
+                    type_name: typeName,
+                    key: key,
+                    value: value,
+                    key_description: description
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '添加配置失败');
+            }
+            
+            // 关闭模态框并刷新页面
+            closeAddConfigModal();
+            showMessage('添加配置成功', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showMessage(error.message, 'danger');
+        }
+    });
+    
+    // 编辑配置表单提交
+    document.getElementById('editConfigForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const typeName = document.getElementById('editConfigType').value;
+        const key = document.getElementById('editConfigKey').value;
+        const value = document.getElementById('editConfigValue').value;
+        const description = document.getElementById('editConfigDescription').value;
+        
+        try {
+            const response = await fetch(`/api/configs/${typeName}/${key}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({
+                    value: value,
+                    key_description: description
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '更新配置失败');
+            }
+            
+            // 关闭模态框并刷新页面
+            closeEditConfigModal();
+            showMessage('更新配置成功', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showMessage(error.message, 'danger');
+        }
+    });
+    
+    // 删除配置
+    async function deleteConfig(typeName, key) {
+        try {
+            console.log(`正在删除配置: ${typeName}.${key}`); // 添加调试日志
+            
+            const response = await fetch(`/api/configs/${encodeURIComponent(typeName)}/${encodeURIComponent(key)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '删除配置失败');
+            }
+            
+            showMessage('删除配置成功', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            console.error('删除配置出错:', error); // 添加错误日志
+            showMessage(error.message, 'danger');
+        }
+    }
+</script>
+{% endblock %}
