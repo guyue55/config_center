@@ -11,27 +11,27 @@ from app.api.pages import page_router
 from app.core.config import settings
 from app.models.database import init_db
 
-# 配置日志
+# 配置日志，确保日志目录存在
+log_dir = Path(__file__).parent.parent / "logs"
+log_dir.mkdir(exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(filename="app.log", encoding="utf-8")
+        logging.FileHandler(filename=str(log_dir / "app.log"), encoding="utf-8")
     ]
 )
 logger = logging.getLogger(__name__)
 
 # 设置模板目录
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
-print("*"*100)
-print("templates:", templates)
-print(str(Path(__file__).parent / "templates"))
 
 app = FastAPI(
     title=settings.APP_NAME,
     description="配置中心API",
-    version="1.0.0",
+    version="1.0.1",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json"

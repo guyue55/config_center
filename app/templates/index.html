@@ -11,43 +11,25 @@
         <p class="welcome-text">配置中心是一个统一管理各类配置的平台，提供便捷的配置创建、修改、删除和查询功能。</p>
         
         <div class="stats-container">
-            <div class="stats-card">
+            <a href="/page/types" class="stats-card">
                 <div class="stats-icon">
                     <i class="fas fa-layer-group"></i>
                 </div>
                 <div class="stats-content">
                     <h3>配置类型</h3>
-                    <div class="stats-info">
-                        <div class="stats-number">{{ types_count|default(0) }}</div>
-                        <div class="stats-trend positive">
-                            <i class="fas fa-chart-line"></i>
-                            <span>活跃</span>
-                        </div>
-                    </div>
-                    <div class="stats-action">
-                        <a href="/page/types" class="btn btn-primary btn-sm">查看类型</a>
-                    </div>
+                    <div class="stats-number">{{ types_count|default(0) }}</div>
                 </div>
-            </div>
+            </a>
             
-            <div class="stats-card">
+            <a href="/page/configs" class="stats-card">
                 <div class="stats-icon">
                     <i class="fas fa-cogs"></i>
                 </div>
                 <div class="stats-content">
                     <h3>配置项</h3>
-                    <div class="stats-info">
-                        <div class="stats-number">{{ configs_count|default(0) }}</div>
-                        <div class="stats-trend positive">
-                            <i class="fas fa-chart-line"></i>
-                            <span>活跃</span>
-                        </div>
-                    </div>
-                    <div class="stats-action">
-                        <a href="/page/configs" class="btn btn-primary btn-sm">查看配置</a>
-                    </div>
+                    <div class="stats-number">{{ configs_count|default(0) }}</div>
                 </div>
-            </div>
+            </a>
         </div>
         
         <div class="quick-start">
@@ -89,6 +71,14 @@
     border: 1px solid rgba(0,0,0,0.08);
     position: relative;
     overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+}
+
+.stats-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    cursor: pointer;
 }
 
 .stats-card::before {
