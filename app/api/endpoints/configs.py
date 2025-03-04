@@ -6,8 +6,7 @@ from app.models.database import get_db
 from app.models.config import Config
 from app.models.type import Type
 from app.schemas.config import ConfigCreate, ConfigUpdate, Config as ConfigSchema, ConfigList, ConfigSearch
-from app.api.deps import get_current_active_user, get_current_admin_user, is_privilege_mode
-from app.models.user import User
+from app.api.deps import is_privilege_mode
 # 添加缺少的导入
 from app import schemas
 
@@ -16,8 +15,7 @@ router = APIRouter()
 @router.post("", response_model=ConfigSchema)
 async def create_config(
     config_data: ConfigCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     创建新的配置项
@@ -178,8 +176,7 @@ async def get_config(
 async def update_config(
     config_id: int,
     config_data: ConfigUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     更新配置项
@@ -219,8 +216,7 @@ async def update_config(
 @router.delete("/{config_id}", response_model=dict)
 async def delete_config(
     config_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     删除配置项（仅管理员）
@@ -354,8 +350,7 @@ async def get_config_by_type_and_key(
 async def delete_config_by_type_and_key(
     type_name: str,
     key: str,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     通过类型名称和键删除配置（仅管理员）
@@ -387,16 +382,11 @@ async def delete_config_by_type_and_key(
 async def delete_config(
         type_name: str,
         key: str,
-        db: AsyncSession = Depends(get_db),
-        # current_user: User = Depends(get_current_user_optional)
-        current_user: User = Depends(get_current_admin_user)
+        db: AsyncSession = Depends(get_db)
     ):
         """
         删除配置项
         """
-        # 检查特权模式
-        if not current_user and not await is_privilege_mode(db):
-            raise HTTPException(status_code=401, detail="需要认证")
         
         # 查询配置项
         result = await db.execute(

@@ -31,44 +31,122 @@ body {
 }
 
 /* 导航栏样式 */
-header {
-  background-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-nav {
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 1rem 2rem;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-link {
+  color: white;
+  text-decoration: none;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
 }
 
 .nav-links {
   display: flex;
   list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
 }
 
-.nav-links li {
-  margin-left: 1.5rem;
-}
-
-.nav-links a {
+.nav-link {
   color: white;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
 }
 
-.nav-links a:hover {
+.nav-link:hover {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.hamburger {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  transition: transform 0.3s;
+}
+
+.hamburger::before {
+  top: -6px;
+}
+
+.hamburger::after {
+  bottom: -6px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--primary-color);
+    padding: 1rem;
+  }
+
+  .nav-menu.active {
+    display: block;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+
+  .nav-toggle.active .hamburger {
+    background-color: transparent;
+  }
+
+  .nav-toggle.active .hamburger::before {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+
+  .nav-toggle.active .hamburger::after {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
 }
 
 /* 主内容区域 */

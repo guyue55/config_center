@@ -8,23 +8,21 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- 导航栏 - 删除重复的导航栏 -->
     <header>
-        <nav>
-           
-            <ul class="nav-links">
-                <li><a href="/page/">首页</a></li>
-                <li><a href="/page/types">配置类型</a></li>
-                <li><a href="/page/configs">配置项</a></li>
-            </ul>
-            <div class="auth-links">
-                <span id="privilegeMode" class="badge badge-warning" style="display: none;">特权模式</span>
-                <span id="userInfo" style="display: none;">
-                    欢迎，<span id="username"></span>
-                    <button onclick="logout()" class="btn btn-sm">退出</button>
-                </span>
-                <a href="/page/login" id="loginLink">登录</a>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="/page/" class="brand-link">配置中心</a>
             </div>
+            <div class="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="/page/" class="nav-link">首页</a></li>
+                    <li><a href="/page/types" class="nav-link">配置类型</a></li>
+                    <li><a href="/page/configs" class="nav-link">配置项</a></li>
+                </ul>
+            </div>
+            <button class="nav-toggle">
+                <span class="hamburger"></span>
+            </button>
         </nav>
     </header>
     
@@ -45,68 +43,7 @@
     
     <!-- 在 script 标签中添加检查特权模式的代码 -->
     <script>
-        // 检查登录状态
-        function checkLoginStatus() {
-            const token = localStorage.getItem('access_token');
-            const username = localStorage.getItem('username');
-            
-            if (token && username) {
-                // 已登录
-                document.getElementById('userInfo').style.display = 'inline-block';
-                document.getElementById('username').textContent = username;
-                document.getElementById('loginLink').style.display = 'none';
-                
-                // 添加令牌到所有API请求
-                addTokenToFetch();
-            } else {
-                // 未登录
-                document.getElementById('userInfo').style.display = 'none';
-                document.getElementById('loginLink').style.display = 'inline-block';
-                
-                // 检查特权模式
-                checkPrivilegeMode();
-            }
-        }
-        
-        // 检查特权模式
-        async function checkPrivilegeMode() {
-            try {
-                const response = await fetch('/api/auth/privilege-mode');
-                const data = await response.json();
-                
-                if (data.privilege_mode) {
-                    document.getElementById('privilegeMode').style.display = 'inline-block';
-                    console.log('特权模式已启用');
-                } else {
-                    document.getElementById('privilegeMode').style.display = 'none';
-                }
-            } catch (error) {
-                console.error('检查特权模式失败:', error);
-            }
-        }
-        
-        // 添加令牌到所有fetch请求
-        function addTokenToFetch() {
-            const originalFetch = window.fetch;
-            window.fetch = function(url, options = {}) {
-                const token = localStorage.getItem('access_token');
-                
-                if (token && url.startsWith('/api/')) {
-                    options.headers = options.headers || {};
-                    options.headers['Authorization'] = `Bearer ${token}`;
-                }
-                
-                return originalFetch(url, options);
-            };
-        }
-        
-        // 退出登录
-        function logout() {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('username');
-            localStorage.removeItem('role');
-            window.location.reload();
-        }
+
         
         // 显示消息
         function showMessage(text, type = 'info') {
@@ -125,10 +62,8 @@
             return confirm(message);
         }
         
-        // 页面加载时检查登录状态
+        // 页面加载时处理表单
         document.addEventListener('DOMContentLoaded', function() {
-            checkLoginStatus();
-            
             // 处理表单AJAX提交
             document.querySelectorAll('form[data-submit-ajax]').forEach(form => {
                 form.addEventListener('submit', async function(event) {
@@ -189,5 +124,6 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+    <script src="/static/js/nav.js"></script>
 </body>
 </html>

@@ -8,37 +8,303 @@
         <h1 class="card-title">欢迎使用配置中心</h1>
     </div>
     <div class="card-body">
-        <p>配置中心是一个统一管理各类配置的平台，提供便捷的配置创建、修改、删除和查询功能。</p>
+        <p class="welcome-text">配置中心是一个统一管理各类配置的平台，提供便捷的配置创建、修改、删除和查询功能。</p>
         
-        <div style="margin-top: 2rem; display: flex; gap: 2rem;">
-            <div class="card" style="flex: 1;">
-                <h3>配置类型</h3>
-                <p style="font-size: 2rem; margin: 1rem 0; color: var(--primary-color);">
-                    {{ types_count|default(0) }}
-                </p>
-                <a href="/api/types" class="btn btn-primary">查看类型</a>
+        <div class="stats-container">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>配置类型</h3>
+                    <div class="stats-info">
+                        <div class="stats-number">{{ types_count|default(0) }}</div>
+                        <div class="stats-trend positive">
+                            <i class="fas fa-chart-line"></i>
+                            <span>活跃</span>
+                        </div>
+                    </div>
+                    <div class="stats-action">
+                        <a href="/page/types" class="btn btn-primary btn-sm">查看类型</a>
+                    </div>
+                </div>
             </div>
             
-            <div class="card" style="flex: 1;">
-                <h3>配置项</h3>
-                <p style="font-size: 2rem; margin: 1rem 0; color: var(--primary-color);">
-                    {{ configs_count|default(0) }}
-                </p>
-                <a href="/api/configs" class="btn btn-primary">查看配置</a>
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>配置项</h3>
+                    <div class="stats-info">
+                        <div class="stats-number">{{ configs_count|default(0) }}</div>
+                        <div class="stats-trend positive">
+                            <i class="fas fa-chart-line"></i>
+                            <span>活跃</span>
+                        </div>
+                    </div>
+                    <div class="stats-action">
+                        <a href="/page/configs" class="btn btn-primary btn-sm">查看配置</a>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div style="margin-top: 2rem;">
-            <h2>快速入门</h2>
-            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>在<a href="/api/types">类型管理</a>中创建新的配置类型</li>
-                <li>在<a href="/api/configs">配置管理</a>中添加配置项</li>
-                <li>使用搜索功能快速查找配置</li>
-                {% if current_user and current_user.role == 'admin' %}
-                <li>在<a href="/api/users">用户管理</a>中管理用户权限</li>
-                {% endif %}
+        <div class="quick-start">
+            <h2><i class="fas fa-rocket"></i> 快速入门</h2>
+            <ul>
+                <li><i class="fas fa-plus-circle"></i> 在<a href="/page/types">类型管理</a>中创建新的配置类型</li>
+                <li><i class="fas fa-edit"></i> 在<a href="/page/configs">配置管理</a>中添加和管理配置项</li>
+                <li><i class="fas fa-search"></i> 使用搜索功能快速查找所需的配置</li>
             </ul>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+.welcome-text {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: flex-start;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.stats-card:hover::before {
+    opacity: 1;
+}
+
+.stats-icon {
+    background: var(--primary-color);
+    color: white;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.8rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card:hover .stats-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.stats-icon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255,255,255,0.1);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+}
+
+.stats-card:hover .stats-icon::after {
+    transform: rotate(45deg) translate(50%, 50%);
+}
+
+.stats-icon i {
+    font-size: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.stats-content {
+    flex: 1;
+}
+
+.stats-content h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.stats-info {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin: 1rem 0;
+}
+
+.stats-number {
+    font-size: 2.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.stats-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(76,175,80,0.1);
+    color: var(--success-color);
+}
+
+.stats-trend.positive {
+    background: rgba(76,175,80,0.1);
+    color: var(--success-color);
+}
+
+.stats-action {
+    margin-top: 1.2rem;
+}
+
+.quick-start {
+    margin-top: 3rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-start::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(25,118,210,0.05) 0%, rgba(25,118,210,0) 100%);
+    pointer-events: none;
+}
+
+.quick-start h2 {
+    margin: 0 0 1.8rem 0;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quick-start ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.quick-start li {
+    margin: 1.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.quick-start li:hover {
+    transform: translateX(8px);
+}
+
+.quick-start li i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.quick-start a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.quick-start a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.quick-start a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+@media (max-width: 768px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-card {
+        padding: 1.5rem;
+    }
+    
+    .stats-icon {
+        width: 52px;
+        height: 52px;
+    }
+    
+    .stats-icon i {
+        font-size: 1.6rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .quick-start {
+        padding: 1.8rem;
+    }
+}
+</style>
 {% endblock %}

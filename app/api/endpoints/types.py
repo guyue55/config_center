@@ -6,8 +6,7 @@ from app.models.database import get_db
 from app.models.type import Type
 from app.models.config import Config
 from app.schemas.type import TypeCreate, TypeUpdate, Type as TypeSchema, TypeList
-from app.api.deps import get_current_active_user, get_current_admin_user, get_current_user_optional, is_privilege_mode
-from app.models.user import User
+from app.api.deps import is_privilege_mode
 
 router = APIRouter()
 
@@ -41,15 +40,11 @@ async def get_types(
 @router.post("", response_model=TypeSchema)
 async def create_type(
     type_data: TypeCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user_optional)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     创建新的配置类型
     """
-    # 检查特权模式
-    if not current_user and not await is_privilege_mode(db):
-        raise HTTPException(status_code=401, detail="需要认证")
     
     # 检查类型名是否已存在
     result = await db.execute(select(Type).where(Type.type_name == type_data.type_name))
@@ -83,15 +78,11 @@ async def get_type(
 async def update_type(
     type_name: str,
     type_data: TypeUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user_optional)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     更新配置类型
     """
-    # 检查特权模式
-    if not current_user and not await is_privilege_mode(db):
-        raise HTTPException(status_code=401, detail="需要认证")
     
     # 查找类型
     result = await db.execute(select(Type).where(Type.type_name == type_name))
@@ -111,15 +102,11 @@ async def update_type(
 @router.delete("/{type_name}", response_model=TypeSchema)
 async def delete_type(
     type_name: str,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user_optional)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     删除配置类型
     """
-    # 检查特权模式
-    if not current_user and not await is_privilege_mode(db):
-        raise HTTPException(status_code=401, detail="需要认证")
     
     # 查询类型
     result = await db.execute(

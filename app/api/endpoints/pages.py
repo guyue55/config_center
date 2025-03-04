@@ -5,8 +5,6 @@ from pathlib import Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.models.database import get_db
-from app.api.deps import get_current_user_optional  # 修改这里，导入正确的函数
-from app.models.user import User
 from app.models.type import Type
 from app.models.config import Config
 from typing import Optional
@@ -39,8 +37,7 @@ async def index(request: Request, db: AsyncSession = Depends(get_db)):
 async def types_page(
     request: Request,
     search: Optional[str] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    db: AsyncSession = Depends(get_db)
 ):
     """配置类型页面"""
     # 构建查询
@@ -56,7 +53,6 @@ async def types_page(
         "types.html",
         {
             "request": request,
-            "current_user": current_user,
             "types": types,
             "search": search
         }
@@ -66,63 +62,38 @@ async def types_page(
 async def configs_page(
     request: Request,
     type_name: Optional[str] = None,
-    search: Optional[str] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    key: Optional[str] = None,
+    value: Optional[str] = None,
+    db: AsyncSession = Depends(get_db)
 ):
     """配置项页面"""
-    # 获取所有类型
-    types_result = await db.execute(select(Type))
-    types = types_result.scalars().all()
-    
     # 构建查询
-    query = select(Config)
-    if type_name:
-        # 获取类型ID
-        type_result = await db.execute(select(Type).where(Type.type_name == type_name))
-        selected_type = type_result.scalar_one_or_none()
-        if selected_type:
-            query = query.where(Config.type_id == selected_type.type_id)
+    query = select(Config, Type).join(Type)
     
-    if search:
-        query = query.where(Config.key.contains(search) | Config.value.contains(search) | Config.key_description.contains(search))
+    # 添加筛选条件
+    if type_name:
+        query = query.where(Type.type_name.contains(type_name))
+    if key:
+        query = query.where(Config.key.contains(key))
+    if value:
+        query = query.where(Config.value.contains(value))
     
     # 执行查询
     result = await db.execute(query)
-    configs = result.scalars().all()
+    rows = result.all()
     
-    # 获取每个配置的类型信息
-    for config in configs:
-        if not hasattr(config, 'type') or config.type is None:
-            type_result = await db.execute(select(Type).where(Type.type_id == config.type_id))
-            config.type = type_result.scalar_one_or_none()
+    # 查询所有类型（用于筛选）
+    types_result = await db.execute(select(Type))
+    types = types_result.scalars().all()
     
     return templates.TemplateResponse(
         "configs.html",
         {
             "request": request,
-            "current_user": current_user,
-            "configs": configs,
+            "configs": rows,
             "types": types,
-            "selected_type": selected_type if type_name else None,
-            "search": search
-        }
-    )
-
-@router.get("/login", response_class=HTMLResponse)
-async def login_page(
-    request: Request,
-    current_user: Optional[User] = Depends(get_current_user_optional)
-):
-    """登录页面"""
-    if current_user:
-        # 如果用户已登录，重定向到首页
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(url="/")
-    
-    return templates.TemplateResponse(
-        "login.html",
-        {
-            "request": request
+            "type_name": type_name,
+            "key": key,
+            "value": value
         }
     )

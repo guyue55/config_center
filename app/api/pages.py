@@ -7,7 +7,6 @@ from sqlalchemy import select, func
 from app.models.database import get_db
 from app.models.type import Type
 from app.models.config import Config
-from app.api.deps import get_current_user_optional
 
 # 将 router 改名为 page_router
 page_router = APIRouter()
@@ -16,7 +15,7 @@ page_router = APIRouter()
 templates = Jinja2Templates(directory=Path(__file__).parent.parent / "templates")
 
 @page_router.get("/")
-async def index_page(request: Request, current_user = Depends(get_current_user_optional), db: AsyncSession = Depends(get_db)):
+async def index_page(request: Request, db: AsyncSession = Depends(get_db)):
     """首页"""
     # 查询类型数量
     result = await db.execute(select(func.count()).select_from(Type))
@@ -27,23 +26,19 @@ async def index_page(request: Request, current_user = Depends(get_current_user_o
     configs_count = result.scalar()
     return templates.TemplateResponse(
         "index.html", 
-        {"request": request, "current_user": current_user,
+        {"request": request,
             "types_count": types_count,
             "configs_count": configs_count
         }
     )
 
-@page_router.get("/login")
-async def login_page(request: Request):
-    """登录页面"""
-    return templates.TemplateResponse("login.html", {"request": request})
+
 
 @page_router.get("/types")
 async def types_page(
     request: Request, 
     search: str = None,
-    db: AsyncSession = Depends(get_db),
-    current_user = Depends(get_current_user_optional)
+    db: AsyncSession = Depends(get_db)
 ):
     """配置类型页面"""
     query = select(Type)
@@ -57,8 +52,7 @@ async def types_page(
         "types.html", 
         {
             "request": request, 
-            "types": types, 
-            "current_user": current_user
+            "types": types
         }
     )
 
@@ -67,8 +61,7 @@ async def configs_page(
     request: Request,
     type_name: str = None,
     search: str = None,
-    db: AsyncSession = Depends(get_db),
-    current_user = Depends(get_current_user_optional)
+    db: AsyncSession = Depends(get_db)
 ):
     """配置项页面"""
     # 获取所有类型
@@ -93,7 +86,6 @@ async def configs_page(
             "request": request, 
             "configs": configs, 
             "types": types,
-            "current_type": type_name,
-            "current_user": current_user
+            "current_type": type_name
         }
     )
