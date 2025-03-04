@@ -31,7 +31,7 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 app = FastAPI(
     title=settings.APP_NAME,
     description="配置中心API",
-    version="1.0.1",
+    version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json"

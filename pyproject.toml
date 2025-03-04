@@ -1,0 +1,12 @@
+[project]
+name = "config_center"
+version = "1.0.0"
+description = "配置中心服务"
+authors = [
+    {name = "Guyue", email = "guyuecw@qq.com"}
+]
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
