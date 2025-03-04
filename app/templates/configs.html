@@ -7,48 +7,66 @@
     <div class="card">
         <div class="card-header">
             <h1 class="card-title">配置项</h1>
-            <!-- 添加新增按钮 -->
-            <button class="btn btn-primary" onclick="showAddConfigModal()">添加配置</button>
+            <button class="btn btn-primary" onclick="showAddConfigModal()">
+                <i class="fas fa-plus"></i> 添加配置
+            </button>
         </div>
         <div class="card-body">
-            <div class="search-container">
+            <div class="search-container mb-4">
                 <form class="search-box" action="/page/configs" method="get">
-                    <select name="type_name" class="form-control" onchange="this.form.submit()">
-                        <option value="">所有类型</option>
-                        {% for type in types %}
-                        <option value="{{ type.type_name }}" {% if current_type == type.type_name %}selected{% endif %}>{{ type.type_name }}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="text" name="search" class="form-control search-input" placeholder="搜索键名或值..." value="{{ request.query_params.get('search', '') }}">
-                    <button type="submit" class="btn btn-primary">搜索</button>
-                    {% if request.query_params.get('search') or request.query_params.get('type_name') %}
-                    <a href="/page/configs" class="btn btn-secondary">清除</a>
-                    {% endif %}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                        <select name="type_name" class="form-control" onchange="this.form.submit()">
+                            <option value="">所有类型</option>
+                            {% for type in types %}
+                            <option value="{{ type.type_name }}" {% if current_type == type.type_name %}selected{% endif %}>{{ type.type_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="搜索键名或值..." value="{{ request.query_params.get('search', '') }}">
+                        <button type="submit" class="btn btn-primary">搜索</button>
+                        {% if request.query_params.get('search') or request.query_params.get('type_name') %}
+                        <a href="/page/configs" class="btn btn-secondary">清除</a>
+                        {% endif %}
+                    </div>
                 </form>
             </div>
             
             <div class="table-container">
-                <table>
+                <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>类型</th>
-                            <th>键名</th>
-                            <th>值</th>
-                            <th>描述</th>
-                            <th>操作</th>
+                            <th><i class="fas fa-layer-group"></i> 类型</th>
+                            <th><i class="fas fa-key"></i> 键名</th>
+                            <th><i class="fas fa-code"></i> 值</th>
+                            <th><i class="fas fa-info-circle"></i> 描述</th>
+                            <th><i class="fas fa-clock"></i> 创建时间</th>
+                            <th><i class="fas fa-history"></i> 更新时间</th>
+                            <th class="text-end">操作</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for config in configs %}
                         <tr>
-                            <td>{{ config.type.type_name }}</td>
+                            <td><span class="badge bg-primary">{{ config.type.type_name }}</span></td>
                             <td>{{ config.key }}</td>
-                            <td>{{ config.value }}</td>
-                            <td>{{ config.key_description }}</td>
                             <td>
-                                <!-- 添加编辑和删除按钮 -->
-                                <button class="btn btn-sm btn-secondary" onclick="showEditConfigModal('{{ config.type.type_name }}', '{{ config.key }}', '{{ config.value }}', '{{ config.key_description }}')">编辑</button>
-                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteConfig('{{ config.type.type_name }}', '{{ config.key }}')">删除</button>
+                                <div class="value-container">
+                                    <code class="config-value">{{ config.value }}</code>
+                                </div>
+                            </td>
+                            <td>{{ config.key_description }}</td>
+                            <td>{{ config.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{{ config.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-secondary" onclick="showEditConfigModal('{{ config.type.type_name }}', '{{ config.key }}', '{{ config.value }}', '{{ config.key_description }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteConfig('{{ config.type.type_name }}', '{{ config.key }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}

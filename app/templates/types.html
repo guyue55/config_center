@@ -7,27 +7,32 @@
     <div class="card">
         <div class="card-header">
             <h1 class="card-title">配置类型</h1>
-            <!-- 添加新增按钮 -->
-            <button class="btn btn-primary" onclick="showAddTypeModal()">添加类型</button>
+            <button class="btn btn-primary" onclick="showAddTypeModal()">
+                <i class="fas fa-plus"></i> 添加类型
+            </button>
         </div>
         <div class="card-body">
-            <div class="search-container">
+            <div class="search-container mb-4">
                 <form class="search-box" action="/page/types" method="get">
-                    <input type="text" name="search" class="form-control search-input" placeholder="搜索类型名称或描述..." value="{{ request.query_params.get('search', '') }}">
-                    <button type="submit" class="btn btn-primary">搜索</button>
-                    {% if request.query_params.get('search') %}
-                    <a href="/page/types" class="btn btn-secondary">清除</a>
-                    {% endif %}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="搜索类型名称或描述..." value="{{ request.query_params.get('search', '') }}">
+                        <button type="submit" class="btn btn-primary">搜索</button>
+                        {% if request.query_params.get('search') %}
+                        <a href="/page/types" class="btn btn-secondary">清除</a>
+                        {% endif %}
+                    </div>
                 </form>
             </div>
             
             <div class="table-container">
-                <table>
+                <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>类型名称</th>
                             <th>描述</th>
-                            <th>操作</th>
+                            <th>创建时间</th>
+                            <th class="text-end">操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,13 +40,19 @@
                         <tr>
                             <td>
                                 <!-- 添加链接，点击类型名称跳转到对应的配置项列表 -->
-                                <a href="/page/configs?type_name={{ type.type_name }}">{{ type.type_name }}</a>
+                                <a href="/page/configs?type_name={{ type.type_name }}" class="type-link">{{ type.type_name }}</a>
                             </td>
                             <td>{{ type.description }}</td>
-                            <td>
-                                <!-- 添加编辑和删除按钮 -->
-                                <button class="btn btn-sm btn-secondary" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">编辑</button>
-                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteType('{{ type.type_name }}')">删除</button>
+                            <td>{{ type.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-secondary" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteType('{{ type.type_name }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
