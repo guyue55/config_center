@@ -400,53 +400,23 @@ tr:hover {
   border-color: var(--primary-color);
   outline: none;
 }
+
 /* 搜索框 */
 .search-container {
-  margin-bottom: 1.5rem;
-  width: 100%;
+  margin: 1.5rem 0;
 }
 
 .search-box {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
-  width: 100%;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.search-box select {
-  min-width: 120px;
-  max-width: 180px;
-  flex-shrink: 0;
-}
-
-.search-input {
-  flex: 1;
-  min-width: 200px;
-}
-
-.search-box .btn {
-  flex-shrink: 0;
-  white-space: nowrap;
-  min-width: 80px;
-}
-
-@media (max-width: 768px) {
-  .search-box {
-    gap: 0.5rem;
-  }
-
-  .search-box select,
-  .search-input,
-  .search-box .btn {
-    width: 100%;
-    margin: 0;
-  }
-
-  .search-box select {
-    max-width: 100%;
-  }
-}
 .input-group {
   display: flex;
   gap: 0.5rem;
