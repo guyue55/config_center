@@ -260,29 +260,32 @@ tbody tr:hover {
   background-color: rgba(99, 164, 255, 0.1);
   transition: background-color 0.2s;
 }
-
-.config-value {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  background: var(--secondary-color);
-  border-radius: 4px;
-  font-family: monospace;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.value-container {
+.btn-group .btn {
   position: relative;
-  max-width: 300px;
 }
 
-.btn-group {
-  display: inline-flex;
-  gap: 0.5rem;
+.btn-group .btn::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  z-index: 1000;
 }
 
+.btn-group .btn:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
 .btn-group .btn {
   border-radius: 4px;
 }
@@ -400,10 +403,10 @@ tr:hover {
   border-color: var(--primary-color);
   outline: none;
 }
-
 /* 搜索框 */
 .search-container {
-  margin: 1.5rem 0;
+  margin-bottom: 1.5rem;
+  padding: 0;
 }
 
 .search-box {
@@ -411,12 +414,39 @@ tr:hover {
   gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
 }
 
+.search-box select {
+  min-width: 150px;
+  max-width: 200px;
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+}
+.search-box .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+@media (max-width: 768px) {
+  .search-box {
+    gap: 0.5rem;
+  }
+
+  .search-box select,
+  .search-input,
+  .search-box .btn {
+    width: 100%;
+    margin: 0;
+  }
+
+  .search-box select {
+    max-width: 100%;
+  }
+}
 .input-group {
   display: flex;
   gap: 0.5rem;
@@ -432,7 +462,6 @@ tr:hover {
   border-radius: 4px;
   color: var(--text-light);
 }
-
 .search-box select {
   min-width: 150px;
   max-width: 200px;
@@ -441,7 +470,6 @@ tr:hover {
   padding: 0.5rem;
   background: white;
 }
-
 .search-input {
   flex: 1;
   min-width: 200px;
@@ -450,12 +478,10 @@ tr:hover {
   padding: 0.5rem;
   transition: border-color 0.3s;
 }
-
 .search-input:focus {
   border-color: var(--primary-color);
   outline: none;
 }
-
 /* 标签样式 */
 .tag {
   display: inline-block;

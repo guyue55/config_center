@@ -46,10 +46,10 @@
                             <td>{{ type.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <button class="btn btn-sm btn-secondary" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">
+                                    <button class="btn btn-sm btn-secondary" data-tooltip="编辑" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteType('{{ type.type_name }}')">
+                                    <button class="btn btn-sm btn-danger" data-tooltip="删除" onclick="confirmDeleteType('{{ type.type_name }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>

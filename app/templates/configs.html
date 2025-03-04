@@ -48,7 +48,7 @@
                     <tbody>
                         {% for config in configs %}
                         <tr>
-                            <td><span class="badge bg-primary">{{ config.type.type_name }}</span></td>
+                            <td><span class="badge bg-primary">{{ config.type_name }}</span></td>
                             <td>{{ config.key }}</td>
                             <td>
                                 <div class="value-container">
@@ -60,10 +60,10 @@
                             <td>{{ config.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <button class="btn btn-sm btn-secondary" onclick="showEditConfigModal('{{ config.type.type_name }}', '{{ config.key }}', '{{ config.value }}', '{{ config.key_description }}')">
+                                    <button class="btn btn-sm btn-secondary" data-tooltip="编辑" onclick="showEditConfigModal('{{ config.type_name }}', '{{ config.key }}', '{{ config.value }}', '{{ config.key_description }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteConfig('{{ config.type.type_name }}', '{{ config.key }}')">
+                                    <button class="btn btn-sm btn-danger" data-tooltip="删除" onclick="confirmDeleteConfig('{{ config.type_name }}', '{{ config.key }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>

@@ -6,7 +6,6 @@ from app.models.database import get_db
 from app.models.type import Type
 from app.models.config import Config
 from app.schemas.type import TypeCreate, TypeUpdate, Type as TypeSchema, TypeList
-from app.api.deps import is_privilege_mode
 
 router = APIRouter()
 

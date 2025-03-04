@@ -6,9 +6,6 @@ from app.models.database import get_db
 from app.models.config import Config
 from app.models.type import Type
 from app.schemas.config import ConfigCreate, ConfigUpdate, Config as ConfigSchema, ConfigList, ConfigSearch
-from app.api.deps import is_privilege_mode
-# 添加缺少的导入
-from app import schemas
 
 router = APIRouter()
 
@@ -378,6 +375,48 @@ async def delete_config_by_type_and_key(
         raise HTTPException(status_code=404, detail=f"类型 '{type_name}' 下不存在键 '{key}'")
     
 # 修改删除配置项的端点s
+@router.put("/{type_name}/{key}", response_model=ConfigSchema)
+async def update_config_by_type_and_key(
+        type_name: str,
+        key: str,
+        config_data: ConfigUpdate,
+        db: AsyncSession = Depends(get_db)
+    ):
+    """
+    通过类型名称和键更新配置
+    """
+    # 查询配置项
+    result = await db.execute(
+        select(Config).join(Type).where(
+            Type.type_name == type_name,
+            Config.key == key
+        )
+    )
+    config = result.scalar_one_or_none()
+    
+    if not config:
+        raise HTTPException(status_code=404, detail=f"找不到配置项: {type_name}.{key}")
+    
+    # 更新配置
+    if config_data.value is not None:
+        config.value = config_data.value
+    if config_data.key_description is not None:
+        config.key_description = config_data.key_description
+    
+    await db.commit()
+    await db.refresh(config)
+    
+    return ConfigSchema(
+        config_id=config.config_id,
+        type_id=config.type_id,
+        key=config.key,
+        value=config.value,
+        key_description=config.key_description,
+        created_at=config.created_at,
+        updated_at=config.updated_at,
+        type_name=type_name
+    )
+
 @router.delete("/{type_name}/{key}", response_model=dict)
 async def delete_config(
         type_name: str,
