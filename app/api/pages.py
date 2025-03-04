@@ -84,16 +84,17 @@ async def configs_page(
     result = await db.execute(query)
     rows = result.all()
     
-    # 处理查询结果，将Config对象的属性转换为字典
+    # 处理查询结果，构建包含类型信息的配置数据
     configs = [{
         "config_id": row[0].config_id,
-        "type_id": row[0].type_id,
         "key": row[0].key,
         "value": row[0].value,
         "key_description": row[0].key_description,
         "created_at": row[0].created_at,
         "updated_at": row[0].updated_at,
-        "type_name": row[1].type_name
+        "type": {
+            "type_name": row[1].type_name
+        }
     } for row in rows]
     
     # 获取所有类型

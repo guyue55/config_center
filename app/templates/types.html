@@ -15,7 +15,6 @@
             <div class="search-container mb-4">
                 <form class="search-box" action="/page/types" method="get">
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
                         <input type="text" name="search" class="form-control" placeholder="搜索类型名称或描述..." value="{{ request.query_params.get('search', '') }}">
                         <button type="submit" class="btn btn-primary">搜索</button>
                         {% if request.query_params.get('search') %}
@@ -46,10 +45,10 @@
                             <td>{{ type.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <button class="btn btn-sm btn-secondary" data-tooltip="编辑" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="编辑" onclick="showEditTypeModal('{{ type.type_name }}', '{{ type.description }}')">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" data-tooltip="删除" onclick="confirmDeleteType('{{ type.type_name }}')">
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="删除" onclick="confirmDeleteType('{{ type.type_name }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -105,6 +104,14 @@
 
 {% block extra_js %}
 <script>
+    // 初始化工具提示
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(tooltip => {
+            new bootstrap.Tooltip(tooltip);
+        });
+    });
+
     // 添加类型模态框
     function showAddTypeModal() {
         document.getElementById('addTypeModal').style.display = 'block';

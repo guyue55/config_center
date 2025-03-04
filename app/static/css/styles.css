@@ -31,7 +31,8 @@
 
 /* 搜索框样式 */
 .search-container {
-    margin-bottom: 20px;
+    margin: 0 0 20px 0;
+    padding: 0;
 }
 
 .search-box {
@@ -49,30 +50,59 @@
 /* 表格样式 */
 .table-container {
     overflow-x: auto;
+    margin: 0 -20px;
+    padding: 0 20px;
 }
 
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin-bottom: 1rem;
     background-color: transparent;
-    border-radius: 4px;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    table-layout: fixed;
 }
 
 th {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     color: #495057;
     font-weight: 600;
     text-align: left;
-    padding: 12px;
+    padding: 1rem 1.5rem;
     border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
 }
 
 td {
-    padding: 12px;
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid #dee2e6;
     color: #212529;
+    vertical-align: middle;
+    line-height: 1.5;
+    word-wrap: break-word;
+    max-width: 300px;
+}
+
+.value-container {
+    position: relative;
+    max-height: 100px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.config-value {
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #333;
+    background: transparent;
 }
 
 tr:hover {
@@ -211,12 +241,17 @@ tr:hover {
         margin-bottom: 0.5rem;
     }
     
-    .table-container {
-        margin: 0 -20px;
-    }
-    
     td, th {
         padding: 8px;
+        font-size: 0.9em;
+    }
+    
+    .value-container {
+        max-height: 80px;
+    }
+    
+    .config-value {
+        font-size: 0.85em;
     }
 }
 /* 配置页面样式优化 */
